@@ -1,0 +1,510 @@
+@import 'tailwindcss';
+
+/* Dark mode is driven by [data-theme] on <html> (set before paint in index.html). */
+@custom-variant dark (&:where([data-theme='dark'], [data-theme='dark'] *));
+
+/* ==========================================================================
+   Pravaah design tokens
+   Change the palette here; components only reference these variables.
+   ========================================================================== */
+
+:root {
+  --gutter: clamp(1.25rem, 0.4rem + 3.4vw, 4.5rem);
+  --space-section: clamp(4.5rem, 2.8rem + 4.6vw, 8.5rem);
+  --space-block: clamp(2.75rem, 1.5rem + 2.6vw, 4.75rem);
+  --nav-h: 4rem;
+}
+@media (min-width: 1024px) {
+  :root {
+    --nav-h: clamp(4.5rem, 3.4rem + 1.5vw, 5.25rem);
+  }
+}
+
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  /* Surfaces: warm engineering paper, not sterile white */
+  --bg: #f4f3ef;
+  --bg-alt: #edece6;
+  --surface: #faf9f6;
+  --elevated: #ffffff;
+
+  /* Text: graphite */
+  --fg: #141619;
+  --fg-2: #474c53;
+  --muted: #62676e;
+
+  /* Lines */
+  --line: #dcd9d1;
+  --line-strong: #c4c0b6;
+  --grid: rgb(20 22 25 / 0.045);
+
+  /* Accent: Pravaah blue/cyan, deepened for text contrast on paper */
+  --accent: #0968a9;
+  --accent-hover: #07548a;
+  --accent-line: #1789c4;
+  --accent-soft: rgb(9 104 169 / 0.08);
+  --on-accent: #ffffff;
+
+  /* Warm accent: from the logo's orange core. Use sparingly. */
+  --warm: #b8440f;
+  --warm-line: #e0621f;
+  --warm-soft: rgb(224 98 31 / 0.1);
+
+  /* Status */
+  --ok: #19734d;
+  --ok-soft: rgb(25 115 77 / 0.1);
+
+  /* Diagrams */
+  --diagram-line: #c9c5bb;
+  --diagram-line-faint: #e2dfd8;
+  --diagram-node: #141619;
+  --diagram-node-fill: #faf9f6;
+  --diagram-flow: #1789c4;
+  --diagram-flow-2: #3fb2de;
+
+  --shadow-frame: 0 1px 0 rgb(20 22 25 / 0.04), 0 18px 40px -24px rgb(20 22 25 / 0.28);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  /* Surfaces: engineering workstation graphite, not navy */
+  --bg: #0e0f10;
+  --bg-alt: #121315;
+  --surface: #17181a;
+  --elevated: #1d1f22;
+
+  --fg: #eceae5;
+  --fg-2: #aeb1b5;
+  --muted: #858a90;
+
+  --line: #26282c;
+  --line-strong: #35383d;
+  --grid: rgb(236 234 229 / 0.035);
+
+  --accent: #45c0ec;
+  --accent-hover: #74d1f2;
+  --accent-line: #2fa9d9;
+  --accent-soft: rgb(69 192 236 / 0.09);
+  --on-accent: #0e0f10;
+
+  --warm: #f07e43;
+  --warm-line: #e8692c;
+  --warm-soft: rgb(240 126 67 / 0.12);
+
+  --ok: #50c48d;
+  --ok-soft: rgb(80 196 141 / 0.12);
+
+  --diagram-line: #3a3d42;
+  --diagram-line-faint: #24262a;
+  --diagram-node: #eceae5;
+  --diagram-node-fill: #17181a;
+  --diagram-flow: #2fa9d9;
+  --diagram-flow-2: #7fd6f5;
+
+  --shadow-frame: 0 1px 0 rgb(0 0 0 / 0.4), 0 24px 48px -28px rgb(0 0 0 / 0.9);
+}
+
+/* The workstation panel (Current focus) is always dark; on a dark page it sits a shade deeper. */
+:root[data-theme='dark'] .workstation {
+  --bg: #09090a;
+  --surface: #141517;
+  --elevated: #1a1c1f;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-bg-alt: var(--bg-alt);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-fg: var(--fg);
+  --color-fg-2: var(--fg-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-line: var(--accent-line);
+  --color-accent-soft: var(--accent-soft);
+  --color-on-accent: var(--on-accent);
+  --color-warm: var(--warm);
+  --color-warm-line: var(--warm-line);
+  --color-warm-soft: var(--warm-soft);
+  --color-ok: var(--ok);
+  --color-ok-soft: var(--ok-soft);
+}
+
+@theme {
+  --font-sans: 'Instrument Sans Variable', 'Instrument Sans', ui-sans-serif, system-ui, -apple-system,
+    'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  /*
+   * Fluid type scale. Values are tuned so that:
+   *   ~390px  → comfortable mobile reading
+   *   1440px  → hero ~73px, h2 ~52px, lead ~24px, body ~18px
+   *   1920px+ → hero 88px, h2 64px, lead 26px, body 19px, labels 13px (caps)
+   */
+  --text-display: clamp(2.4rem, 0.6rem + 4.1vw, 5.5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.036em;
+
+  --text-h2: clamp(2rem, 1.05rem + 2.45vw, 4rem);
+  --text-h2--line-height: 1.06;
+  --text-h2--letter-spacing: -0.03em;
+
+  --text-h3: clamp(1.15rem, 0.95rem + 0.45vw, 1.5rem);
+  --text-h3--line-height: 1.25;
+  --text-h3--letter-spacing: -0.015em;
+
+  --text-h4: clamp(1.05rem, 0.9rem + 0.3vw, 1.3125rem);
+  --text-h4--line-height: 1.3;
+  --text-h4--letter-spacing: -0.012em;
+
+  --text-lead: clamp(1.125rem, 0.85rem + 0.72vw, 1.625rem);
+  --text-lead--line-height: 1.5;
+  --text-lead--letter-spacing: -0.008em;
+
+  --text-body: clamp(1rem, 0.86rem + 0.3vw, 1.1875rem);
+  --text-body--line-height: 1.65;
+
+  --text-body-sm: clamp(0.9375rem, 0.84rem + 0.2vw, 1.0625rem);
+  --text-body-sm--line-height: 1.55;
+
+  --text-caption: clamp(0.8125rem, 0.74rem + 0.14vw, 0.9375rem);
+  --text-caption--line-height: 1.5;
+
+  --text-nav: clamp(0.9375rem, 0.85rem + 0.12vw, 1rem);
+
+  --text-label: clamp(0.6875rem, 0.6rem + 0.18vw, 0.8125rem);
+  --text-label--line-height: 1.25;
+  --text-label--letter-spacing: 0.09em;
+
+  --radius-frame: 8px;
+
+  --ease-flow: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: calc(var(--nav-h) + 1rem);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: 'ss01', 'cv11';
+    overflow-x: clip;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    text-wrap: balance;
+    font-weight: 600;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  img,
+  video {
+    max-width: 100%;
+    display: block;
+  }
+}
+
+/* ==========================================================================
+   Components
+   ========================================================================== */
+
+@layer components {
+  /*
+   * Width system. Sections pick the width that suits their content:
+   *   .container-page  standard sections        (content up to 1440px)
+   *   .container-wide  diagrams, media, hero    (content up to 1664px)
+   * Gutters grow with the viewport; beyond the cap, content stays centred.
+   */
+  .container-page,
+  .container-wide {
+    width: 100%;
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+    max-width: calc(var(--content-max) + 2 * var(--gutter));
+  }
+  .container-page {
+    --content-max: 90rem;
+  }
+  .container-wide {
+    --content-max: 104rem;
+  }
+
+  /* Vertical rhythm between sections and inside them */
+  .section-y {
+    padding-block: var(--space-section);
+  }
+  .mt-block {
+    margin-top: var(--space-block);
+  }
+
+  /* Mono technical label: section indices, states, identifiers */
+  .label {
+    font-family: var(--font-mono);
+    font-size: var(--text-label);
+    line-height: var(--text-label--line-height);
+    letter-spacing: var(--text-label--letter-spacing);
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    height: clamp(2.75rem, 2.35rem + 0.6vw, 3.25rem);
+    padding-inline: clamp(1.15rem, 0.9rem + 0.5vw, 1.6rem);
+    border-radius: 6px;
+    font-size: clamp(0.9375rem, 0.86rem + 0.15vw, 1.0625rem);
+    font-weight: 550;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+    transition:
+      background-color 0.2s ease,
+      color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s var(--ease-flow);
+  }
+  .btn svg {
+    transition: transform 0.25s var(--ease-flow);
+  }
+  .btn:hover svg.btn-arrow {
+    transform: translateX(3px);
+  }
+  .btn-primary {
+    background: var(--fg);
+    color: var(--bg);
+  }
+  .btn-primary:hover {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+  .btn-secondary {
+    border: 1px solid var(--line-strong);
+    color: var(--fg);
+    background: transparent;
+  }
+  .btn-secondary:hover {
+    border-color: var(--fg);
+  }
+  .btn-sm {
+    height: clamp(2.375rem, 2.1rem + 0.4vw, 2.75rem);
+    padding-inline: clamp(0.95rem, 0.8rem + 0.3vw, 1.25rem);
+    font-size: clamp(0.875rem, 0.82rem + 0.1vw, 0.9375rem);
+  }
+
+  .link-underline {
+    background-image: linear-gradient(currentColor, currentColor);
+    background-size: 0% 1px;
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    transition: background-size 0.3s var(--ease-flow);
+  }
+  .link-underline:hover {
+    background-size: 100% 1px;
+  }
+
+  /* Subtle technical grid - used only on diagram and media panels */
+  .bg-grid {
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 24px 24px;
+    background-position: -1px -1px;
+  }
+
+  .media-frame {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-frame);
+    background: var(--surface);
+    box-shadow: var(--shadow-frame);
+    overflow: hidden;
+  }
+
+  .sr-only-focusable:not(:focus) {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* ==========================================================================
+   Flow motif - tracer particles travelling along streamlines
+   ========================================================================== */
+
+@layer components {
+/* --flow-dash is "dash gap"; --flow-period must equal dash + gap for a seamless loop. */
+.flow-tracer {
+  fill: none;
+  stroke-linecap: round;
+  stroke-dasharray: var(--flow-dash, 8px 152px);
+  animation: flow-dash var(--flow-duration, 2.6s) linear infinite;
+  animation-delay: var(--flow-delay, 0s);
+}
+
+.flow-tracer-reverse {
+  animation-direction: reverse;
+}
+
+@keyframes flow-dash {
+  from {
+    stroke-dashoffset: 0;
+  }
+  to {
+    stroke-dashoffset: calc(-1 * var(--flow-period, 160px));
+  }
+}
+
+/* Vertical rail pulse used by stacked (mobile) diagrams */
+.rail {
+  position: relative;
+  background: var(--diagram-line);
+}
+.rail::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    var(--diagram-flow) 45%,
+    var(--diagram-flow-2) 50%,
+    transparent 58%
+  );
+  background-size: 100% 220%;
+  animation: rail-pulse 3.2s linear infinite;
+}
+@keyframes rail-pulse {
+  from {
+    background-position: 0 120%;
+  }
+  to {
+    background-position: 0 -120%;
+  }
+}
+
+.rail-up::after,
+.rail-x-reverse::after {
+  animation-direction: reverse;
+}
+
+/* Horizontal rail pulse used by stepped sequences */
+.rail-x {
+  position: relative;
+  background: var(--diagram-line);
+  overflow: hidden;
+}
+.rail-x::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    var(--diagram-flow) 44%,
+    var(--diagram-flow-2) 50%,
+    transparent 56%
+  );
+  background-size: 220% 100%;
+  animation: rail-pulse-x 4.2s linear infinite;
+}
+@keyframes rail-pulse-x {
+  from {
+    background-position: 120% 0;
+  }
+  to {
+    background-position: -120% 0;
+  }
+}
+
+@keyframes sweep {
+  from {
+    left: -15%;
+  }
+  to {
+    left: 105%;
+  }
+}
+
+.status-dot-live {
+  animation: status-pulse 2.4s ease-in-out infinite;
+}
+@keyframes status-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  /* !important: tracers carry an inline opacity */
+  .flow-tracer {
+    animation: none !important;
+    opacity: 0 !important;
+  }
+  .rail::after,
+  .rail-x::after,
+  .status-dot-live {
+    animation: none;
+  }
+  .rail::after,
+  .rail-x::after {
+    opacity: 0;
+  }
+  *,
+  *::before,
+  *::after {
+    transition-duration: 0.01ms !important;
+  }
+}
